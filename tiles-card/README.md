@@ -1,4 +1,6 @@
-Fork of Tiles Card for [Lovelace](https://www.home-assistant.io/lovelace/) forked from [rodrigofragadf](https://github.com/rodrigofragadf/lovelace-cards/raw/master/tiles-card/tiles-card.js) and updated. Huge thanks to @rodrigofragadf for all the work on this project. 
+## Description 
+
+Tiles Card for [Lovelace](https://www.home-assistant.io/lovelace/) forked from [rodrigofragadf](https://github.com/rodrigofragadf/lovelace-cards/raw/master/tiles-card/tiles-card.js) and updated. Huge thanks to @rodrigofragadf for all the work on this project. 
 
 _____
 
@@ -27,6 +29,10 @@ Some features available on this card:
 - Shadow support
 - Disable unavailable entities
 - And more...
+
+_____
+
+## Example Lovelace Config:
 
 ```yaml
 views:
