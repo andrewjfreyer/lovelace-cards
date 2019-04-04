@@ -1,3 +1,4 @@
+//version = 0.2
 class TilesCard extends HTMLElement {
 
   constructor() {
@@ -6,7 +7,6 @@ class TilesCard extends HTMLElement {
     this._DOMAIN_SCRIPT = ["script", "python_script"];
     this._DOMAIN_SENSOR = ["sensor", "binary_sensor", "device_tracker"];
     this._DOMAIN_NO_ONOFF = this._DOMAIN_SCRIPT.concat("sensor", "scene", "weblink");
-    this._DOMAIN_INPUT_SELECT = ["input_select"];
     this._DOMAIN_REMOTE = ["remote"];
     this._ON_STATES = ["on", "open", "locked", "home"];
   }
@@ -95,50 +95,37 @@ class TilesCard extends HTMLElement {
       entity.domain = entity.entity ? entity.entity.split('.')[0] : "";
       entity.disable = (entity.disable === undefined) ? (config.global_settings && config.global_settings.disable) : entity.disable;
 
-      if(this._DOMAIN_INPUT_SELECT.includes(entity.domain)) {
+
         
-        entity.icon = (entity.icon === undefined) ? (config.global_settings && config.global_settings.icon) : entity.icon;
+      if(entity.label === undefined && config.global_settings && config.global_settings.label) {
+        if(typeof(config.global_settings.label) == "string") entity.label = {value: config.global_settings.label};
+        else entity.label = {value: config.global_settings.label.value};
+      }
 
-        if(!entity.icon) entity.icon = "";
-        else if(typeof(entity.icon) == "string") entity.icon = {value: entity.icon};
-        else if(typeof(entity.icon) == "object" && entity.icon.color && typeof(entity.icon.color) == "object") entity.icon.color = entity.icon.color.value;
+      if(entity.label_sec === undefined && config.global_settings && config.global_settings.label_sec) {
+        if(typeof(config.global_settings.label_sec) == "string") entity.label_sec = {value: config.global_settings.label_sec};
+        else entity.label_sec = {value: config.global_settings.label_sec.value};
+      }
 
-        if(!entity.title && config.global_settings && config.global_settings.listbox && config.global_settings.listbox.title) 
-          entity.title = config.global_settings.listbox.title;
-          
-        paperComponent = this._createPaperDropdownMenu(entity);
-      } else {
-        
-        if(entity.label === undefined && config.global_settings && config.global_settings.label) {
-          if(typeof(config.global_settings.label) == "string") entity.label = {value: config.global_settings.label};
-          else entity.label = {value: config.global_settings.label.value};
-        }
+      if(entity.icon === undefined && config.global_settings && config.global_settings.icon) {
+        if(typeof(config.global_settings.icon) == "string") entity.icon = {value: config.global_settings.icon};
+        else {
+          entity.icon = { value: config.global_settings.icon.value, 
+                          value_on: config.global_settings.icon.value_on, 
+                          value_off: config.global_settings.icon.value_off, 
+                          value_disabled: config.global_settings.icon.value_disabled};
+        } 
+      }
 
-        if(entity.label_sec === undefined && config.global_settings && config.global_settings.label_sec) {
-          if(typeof(config.global_settings.label_sec) == "string") entity.label_sec = {value: config.global_settings.label_sec};
-          else entity.label_sec = {value: config.global_settings.label_sec.value};
-        }
+      if(!entity.icon) entity.icon = "";
+      else if(typeof(entity.icon) == "string") entity.icon = {value: entity.icon};
+      if(!entity.label) entity.label = "";
+      else if(typeof(entity.label) == "string") entity.label = {value: entity.label};
+      if(!entity.label_sec) entity.label_sec = "";
+      else if(typeof(entity.label_sec) == "string") entity.label_sec = {value: entity.label_sec};
 
-        if(entity.icon === undefined && config.global_settings && config.global_settings.icon) {
-          if(typeof(config.global_settings.icon) == "string") entity.icon = {value: config.global_settings.icon};
-          else {
-            entity.icon = { value: config.global_settings.icon.value, 
-                            value_on: config.global_settings.icon.value_on, 
-                            value_off: config.global_settings.icon.value_off, 
-                            value_disabled: config.global_settings.icon.value_disabled};
-          } 
-        }
-
-        if(!entity.icon) entity.icon = "";
-        else if(typeof(entity.icon) == "string") entity.icon = {value: entity.icon};
-        if(!entity.label) entity.label = "";
-        else if(typeof(entity.label) == "string") entity.label = {value: entity.label};
-        if(!entity.label_sec) entity.label_sec = "";
-        else if(typeof(entity.label_sec) == "string") entity.label_sec = {value: entity.label_sec};
-
-        paperComponent = this._createPaperButton(entity);
-      } 
-
+      paperComponent = this._createPaperButton(entity);
+     
       entitiesStyleValues.textContent += this._getStylesPaperComponent(entity);
 
       paperComponent.id = entity.id;
@@ -189,15 +176,11 @@ class TilesCard extends HTMLElement {
         ironIcon.setAttribute((icon.indexOf("mdi:") >= 0) ? "icon" : "src", icon);
       }
       
-      if(this._DOMAIN_INPUT_SELECT.includes(entity.domain)) {
-        this._updatePaperDropdownMenu(paperComponent, entity);
-      } else {
-        var label = this._hasLabel(entity) ? this._getLabel(entity) : "";
-        var labelSec = this._hasLabelSec(entity) ? this._getLabelSec(entity) : "";
+      var label = this._hasLabel(entity) ? this._getLabel(entity) : "";
+      var labelSec = this._hasLabelSec(entity) ? this._getLabelSec(entity) : "";
 
-        if(label) paperComponent.getElementsByClassName('label')[0].innerHTML = label;
-        if(labelSec) paperComponent.getElementsByClassName('labelSec')[0].innerHTML = labelSec;
-      }
+      if(label) paperComponent.getElementsByClassName('label')[0].innerHTML = label;
+      if(labelSec) paperComponent.getElementsByClassName('labelSec')[0].innerHTML = labelSec;
 
     });
   }
@@ -242,85 +225,6 @@ class TilesCard extends HTMLElement {
 
   _isClickable(entity){
     return entity.domain || entity.more_info || entity.service;
-  }
-
-  _createPaperDropdownMenu(entity){
-    var divPaperDropdownMenu = document.createElement('tiles-listbox');
-    var paperDropdownMenu = document.createElement('paper-dropdown-menu');
-    var paperListbox = document.createElement('paper-listbox');
-    var optionsList;
-
-    if(entity.icon && entity.icon.color) entity.icon.color = {value: entity.icon.color};
-    
-    paperDropdownMenu.label = entity.title ? entity.title : "";
-    paperDropdownMenu.className = "dropdownMenu";
-    paperDropdownMenu.styleApplied = false;
-    paperDropdownMenu.appendChild(paperListbox);
-    paperListbox.tabIndex = 0;
-    paperListbox.slot = "dropdown-content";
-    entity.service = "input_select.select_option";
-
-    if(this._hasIcon(entity)){
-      var div = document.createElement('div');
-      div.className = "icon";
-      var ironIcon = document.createElement('iron-icon');
-      div.appendChild(ironIcon);
-      divPaperDropdownMenu.appendChild(div);
-    }
-
-    divPaperDropdownMenu.loadItensList = function(card, optionsListTemp) {
-      optionsList = optionsListTemp;
-      if(paperListbox.childElementCount <= 0){
-        optionsList.forEach(item => {
-          var paperItem = document.createElement('paper-item');
-          paperItem.innerHTML = item;
-          paperItem.className = "itemLista";
-          paperItem.style.setProperty("cursor", "pointer");
-          paperItem.addEventListener('click', event => {
-            entity.data = { entity_id: entity.entity, option: item };
-            card._onClick(entity);
-          });
-          paperListbox.appendChild(paperItem);
-        });
-      }
-    };
-
-    divPaperDropdownMenu.disable = function(value){
-      paperDropdownMenu.disabled = (value === true) ? true : false;
-    };
-
-    divPaperDropdownMenu.setItem = function(selectedItem){
-      paperListbox.selected = optionsList.indexOf(selectedItem);
-    };
-
-    divPaperDropdownMenu.appendChild(paperDropdownMenu);
-
-    return divPaperDropdownMenu;
-  }
-
-  _updatePaperDropdownMenu(divPaperDropdownMenu, entity){
-    var paperDropdownMenu = divPaperDropdownMenu.getElementsByTagName('paper-dropdown-menu').item(0);
-    var inputSelect = this.myHass.states[entity.entity];
-    var optionsList = inputSelect.attributes.options;
-    var selectedItem = inputSelect.state;
-
-    divPaperDropdownMenu.loadItensList(this, optionsList);
-    divPaperDropdownMenu.setItem(selectedItem);
-
-    if(paperDropdownMenu.shadowRoot && !divPaperDropdownMenu.styleApplied) {
-      var paperInputContainer = paperDropdownMenu.shadowRoot.children[2].children[0].children[1].shadowRoot.children[1];
-      var divInputWrapper = paperInputContainer.shadowRoot.children[2];
-      var paperInputLabel = paperInputContainer.children[1];
-      paperInputContainer.setAttribute("style", "padding: 0px;");
-      divInputWrapper.setAttribute("style", "height: var(--tiles-listbox-input-height, var(--tiles-default-listbox-input-height));");
-      paperInputLabel.setAttribute("style", "height: var(--tiles-listbox-title-height, var(--tiles-default-listbox-title-height));");
-      var input = paperInputContainer.children[2].children[0];
-      input.setAttribute("style", `color: var(--tiles-listbox-input-color, var(--tiles-default-listbox-input-color)); 
-                                   text-transform: var(--tiles-listbox-input-transform, var(--tiles-default-listbox-input-transform));`);
-      if(!entity.title) paperInputContainer.shadowRoot.children[1].style.display = "none";
-
-      divPaperDropdownMenu.styleApplied = true;
-    }
   }
 
   _getCardStylesValues(config) {
@@ -380,7 +284,6 @@ class TilesCard extends HTMLElement {
     style += ` --tiles-default-opacity: 1;\n`;
     style += ` --tiles-default-opacity-disabled: 0.5;\n`;
     style += ` --tiles-default-padding: 0px;\n`;
-    style += ` --tiles-default-listbox-padding: 0px;\n`;
     style += ` --tiles-default-dropdownmenu-padding: 0px 5px;\n`;
     style += ` --tiles-default-grayscale: none;\n`;
     style += ` --tiles-default-contents-color: var(--primary-text-color);\n`;
@@ -393,7 +296,6 @@ class TilesCard extends HTMLElement {
     style += ` --tiles-default-margin: 0;\n`;
     style += ` --tiles-default-min-width: 10px;\n`;
     style += ` --tiles-default-min-height: 10px;\n`;
-    style += ` --tiles-default-listbox-orientation: row;\n`;
     style += ` --tiles-default-orientation: column;\n`;
     style += ` --tiles-default-vertical-align: center;\n`;
     style += ` --tiles-default-horizontal-align: center;\n`;
@@ -402,17 +304,7 @@ class TilesCard extends HTMLElement {
     style += ` --tiles-default-border-color-disabled: var(--tiles-border-color, var(--tiles-default-contents-color));\n`;
     style += ` --tiles-default-grayscale-disabled: var(--tiles-grayscale, var(--tiles-default-grayscale));\n`;
     style += ` --tiles-default-dropdownmenu-width: 100%;\n`;
-    style += ` --tiles-default-listbox-title-transform: none;\n`;
-    style += ` --tiles-default-listbox-title-color: var(--tiles-default-contents-color);\n`;
-    style += ` --tiles-default-listbox-background-list-color: var(--tiles-background, var(--primary-color));\n`;
-    style += ` --tiles-default-listbox-itens-color: var(--tiles-listbox-input-color, var(--tiles-listbox-title-color, var(--tiles-default-contents-color)));\n`;
-    style += ` --tiles-default-listbox-itens-size: var(--tiles-listbox-input-size, var(--paper-input-container-shared-input-style_-_font-size, var(--tiles-default-titles-size)));\n`;
-    style += ` --tiles-default-listbox-itens-transform: var(--tiles-listbox-input-transform, var(--tiles-listbox-title-transform, none));\n`;
     style += ` --tiles-default-label-transform: uppercase;\n`;
-    style += ` --tiles-default-listbox-input-height: none;\n`;
-    style += ` --tiles-default-listbox-title-height: none;\n`;
-    style += ` --tiles-default-listbox-input-color: var(--tiles-listbox-title-color, var(--tiles-default-contents-color));\n`; 
-    style += ` --tiles-default-listbox-input-transform: var(--tiles-listbox-title-transform, none);\n`; 
 
     return style+"}\n";
   }
@@ -429,34 +321,8 @@ class TilesCard extends HTMLElement {
       style += ` --tiles-grid-area: ${row} / ${column} / span ${row_span} / span ${column_span};\n`;
     }
 
-    if(tilesConfig.label && !this._DOMAIN_INPUT_SELECT.includes(tilesConfig.domain)) computeLabelStyle(tilesConfig, "label");
-    if(tilesConfig.label_sec && !this._DOMAIN_INPUT_SELECT.includes(tilesConfig.domain)) computeLabelStyle(tilesConfig, "label_sec");
-
-    if(tilesConfig.listbox || this._DOMAIN_INPUT_SELECT.includes(tilesConfig.domain)) {
-
-      var listbox = tilesConfig.listbox ? tilesConfig.listbox : tilesConfig;
-
-      if(listbox.title_color) style += ` --tiles-listbox-title-color: ${listbox.title_color};\n`; //for list label
-      if(listbox.title_color) style += ` --paper-font-subhead_-_font-color: ${listbox.title_color};\n`; //for list label
-      if(listbox.title_size) style += ` --paper-font-subhead_-_font-size: ${listbox.title_size};\n`; //for list label
-      if(listbox.title_height) style += ` --tiles-listbox-title-height: ${listbox.title_height};\n`;
-      if(listbox.title_transform) style += ` --tiles-listbox-title-transform: ${listbox.title_transform};\n`;
-
-      if(listbox.input_color) style += ` --tiles-listbox-input-color: ${listbox.input_color};\n`; //for list label
-      if(listbox.input_color) style += ` --paper-font-subhead_-_font-color: ${listbox.input_color};\n`; //for list label
-      if(listbox.input_size) style += ` --paper-input-container-shared-input-style_-_font-size: ${listbox.input_size};\n`; //for list label
-      if(listbox.input_height) style += ` --tiles-listbox-input-height: ${listbox.input_height};\n`;
-      if(listbox.input_transform) style += ` --tiles-listbox-input-transform: ${listbox.input_transform};\n`;
-
-      if(listbox.itens_color) style += ` --tiles-listbox-itens-color: ${listbox.itens_color};\n`; //for list label
-      if(listbox.itens_color) style += ` --paper-font-subhead_-_font-color: ${listbox.itens_color};\n`; //for list label
-      if(listbox.itens_size) style += ` --tiles-listbox-itens-size: ${listbox.itens_size};\n`; //for list label
-      if(listbox.itens_transform) style += ` --tiles-listbox-itens-transform: ${listbox.itens_transform};\n`;
-      if(listbox.list_background) style += ` --tiles-listbox-background-list-color: ${listbox.list_background};\n`;
-
-      if(listbox.padding) style += ` --tiles-dropdownmenu-padding: ${listbox.padding};\n`;
-
-    }
+    if(tilesConfig.label) computeLabelStyle(tilesConfig, "label");
+    if(tilesConfig.label_sec) computeLabelStyle(tilesConfig, "label_sec");
 
     function computeLabelStyle(config, labelName) {
       var styleLabel = labelName.replace(/_/g, "-");
@@ -621,10 +487,6 @@ class TilesCard extends HTMLElement {
     if(entity.templates.opacity) paperComponent.style.setProperty("--tiles-opacity", this._getValueFromTemplate(entity, "opacity"));
     if(entity.templates.grayscale) paperComponent.style.setProperty("--tiles-grayscale", this._getValueFromTemplate(entity, "grayscale"));
 
-    if(entity.templates.title_color) paperComponent.style.setProperty("--tiles-listbox-title-color", this._getValueFromTemplate(entity, "title_color"));
-    if(entity.templates.input_color) paperComponent.style.setProperty("--tiles-listbox-input-color", this._getValueFromTemplate(entity, "input_color"));
-    if(entity.templates.itens_color) paperComponent.style.setProperty("--tiles-listbox-itens-color", this._getValueFromTemplate(entity, "itens_color"));
-
     if(entity.templates.style) paperComponent.style.cssText += this._getValueFromTemplate(entity, "style");
   }
 
@@ -684,8 +546,6 @@ class TilesCard extends HTMLElement {
     if(entity.templates && entity.templates.class_name) {
       return this._getValueFromTemplate(entity, "class_name");
     } else if(!entityId || this._DOMAIN_NO_ONOFF.includes(entityId.split('.')[0])) {
-      return '';
-    } else if(!entityId || this._DOMAIN_INPUT_SELECT.includes(entityId.split('.')[0])) {
       return '';
     } else if(this.myHass.states[entityId] && this.myHass.states[entityId].state === 'unavailable') {
       return 'unavailable';
@@ -777,65 +637,6 @@ class TilesCard extends HTMLElement {
           padding: var(--tiles-card-padding, var(--tiles-default-card-padding));
           padding-top: var(--tiles-card-padding-top, var(--tiles-card-padding, var(--tiles-default-card-padding)));
           justify-content: var(--tiles-card-align, var(--tiles-default-card-align));
-      }
-      
-      tiles-listbox {
-          /* height: 100%;
-          width: 100%; */
-          grid-area: var(--tiles-grid-area, var(--tiles-default-grid-area));
-          display: var(--tiles-display, var(--tiles-default-display));
-          visibility: var(--tiles-visibility, var(--tiles-default-visibility));
-          background: var(--tiles-background, var(--tiles-default-background));
-          box-shadow: var(--tiles-box-shadow, var(--tiles-default-box-shadow)) !important;
-          margin: var(--tiles-default-margin) !important;
-          min-width: var(--tiles-default-min-width);
-          min-height: var(--tiles-default-min-height);
-          flex-direction: var(--tiles-orientation, var(--tiles-default-listbox-orientation));
-          align-items: var(--tiles-vertical-align, var(--tiles-default-vertical-align));
-          justify-content: var(--tiles-horizontal-align, var(--tiles-default-horizontal-align));
-          opacity: var(--tiles-opacity, var(--tiles-default-opacity));
-          border-style: var(--tiles-border-style, var(--tiles-default-border-style));
-          border-width: var(--tiles-border-size, var(--tiles-default-border-size));
-          border-color: var(--tiles-border-color, var(--tiles-default-contents-color));
-          border-radius: var(--tiles-border-radius, var(--tiles-default-border-radius));
-          padding: var(--tiles-default-listbox-padding);
-          -webkit-filter: grayscale(var(--tiles-grayscale, var(--tiles-default-grayscale))); /* Google Chrome, Safari 6+ & Opera 15+ */
-          filter: grayscale(var(--tiles-grayscale, var(--tiles-default-grayscale))); /* Microsoft Edge and Firefox 35+ */
-      }
-      
-      tiles-listbox .icon {
-          height: var(--tiles-icon-size, var(--tiles-default-icon-size));
-          width: var(--tiles-icon-size, var(--tiles-default-icon-size));
-          padding: var(--tiles-icon-padding, var(--tiles-default-icon-padding));
-          --iron-icon-fill-color: var(--tiles-icon-color, var(--tiles-default-contents-color));
-          --iron-icon-height: var(--tiles-icon-size, var(--tiles-default-icon-size));
-          --iron-icon-width: var(--tiles-icon-size, var(--tiles-default-icon-size));
-      }
-      
-      tiles-listbox.disabled {
-          background: var(--tiles-background-disabled, var(--tiles-default-background-disabled));
-          opacity: var(--tiles-opacity-disabled, var(--tiles-default-opacity-disabled));
-          border-color: var(--tiles-border-color-disabled, var(--tiles-default-border-color-disabled));
-      
-          -webkit-filter: grayscale(var(--tiles-grayscale-disabled, var(--tiles-default-grayscale-disabled))); /* Google Chrome, Safari 6+ & Opera 15+ */
-          filter: grayscale(var(--tiles-grayscale-disabled, var(--tiles-default-grayscale-disabled))); /* Microsoft Edge and Firefox 35+ */
-      }
-      
-      tiles-listbox paper-dropdown-menu {
-          width: var(--tiles-default-dropdownmenu-width);
-          padding: var(--tiles-dropdownmenu-padding, var(--tiles-default-dropdownmenu-padding)); /* top|right|bottom|left */
-          text-transform: var(--tiles-listbox-title-transform, var(--tiles-default-listbox-title-transform));
-      
-          --paper-input-container-color: var(--tiles-listbox-title-color, var(--tiles-default-listbox-title-color));
-          --iron-icon-fill-color: var(--tiles-listbox-title-color, var(--tiles-default-listbox-title-color));
-          --paper-listbox-background-color: var(--tiles-listbox-background-list-color, var(--tiles-default-listbox-background-list-color));
-          --paper-listbox-color: var(--tiles-listbox-itens-color, var(--tiles-default-listbox-itens-color));
-          --paper-input-container-focus-color: var(--tiles-background, var(--tiles-default-background));
-      }
-      
-      tiles-listbox paper-item {
-          font-size: var(--tiles-listbox-itens-size, var(--tiles-default-listbox-itens-size));
-          text-transform: var(--tiles-listbox-itens-transform, var(--tiles-default-listbox-itens-transform));
       }
       
       paper-button {
