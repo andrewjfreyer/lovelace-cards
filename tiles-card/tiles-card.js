@@ -1,4 +1,6 @@
-//version = 0.1.2
+//version = 0.1.3
+
+
 class TilesCard extends HTMLElement {
 
   constructor() {
@@ -217,7 +219,7 @@ class TilesCard extends HTMLElement {
       paperButton.disabled = (value === true) ? true : false;
     };
 
-    if(this._isClickable(entity)) paperButton.addEventListener('click', event => { this._onClick(entity) });
+    if(this._isClickable(entity)) paperButton.addEventListener('dblclick', event => { this._onClick(entity) });
     else paperButton.style.setProperty("cursor", "default");
 
     return paperButton;
