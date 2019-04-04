@@ -1,4 +1,4 @@
-//version = 0.1.1
+//version = 0.1.2
 class TilesCard extends HTMLElement {
 
   constructor() {
@@ -285,7 +285,6 @@ class TilesCard extends HTMLElement {
     style += ` --tiles-default-opacity-disabled: 0.5;\n`;
     style += ` --tiles-default-padding: 0px;\n`;
     style += ` --tiles-default-dropdownmenu-padding: 0px 5px;\n`;
-    style += ` --tiles-default-grayscale: none;\n`;
     style += ` --tiles-default-contents-color: var(--primary-text-color);\n`;
     style += ` --tiles-default-box-shadow: none;\n`;
     style += ` --tiles-default-image-size: contain;\n`;
@@ -302,7 +301,6 @@ class TilesCard extends HTMLElement {
     style += ` --tiles-default-text-align: center;\n`;
     style += ` --tiles-default-background-disabled: var(--tiles-background,  var(--tiles-default-background));\n`;
     style += ` --tiles-default-border-color-disabled: var(--tiles-border-color, var(--tiles-default-contents-color));\n`;
-    style += ` --tiles-default-grayscale-disabled: var(--tiles-grayscale, var(--tiles-default-grayscale));\n`;
     style += ` --tiles-default-dropdownmenu-width: 100%;\n`;
     style += ` --tiles-default-label-transform: uppercase;\n`;
 
@@ -404,10 +402,6 @@ class TilesCard extends HTMLElement {
       computeStatesAttributes(tilesConfig, "opacity");
     }
     
-    if(tilesConfig.grayscale != undefined) {
-      computeStatesAttributes(tilesConfig, "grayscale");
-    }
-    
     if(tilesConfig.padding) style += ` --tiles-padding: ${tilesConfig.padding};\n`;
     
     if(tilesConfig.shadow) {
@@ -443,7 +437,6 @@ class TilesCard extends HTMLElement {
       if(!entity.templates.display) entity.templates.display = globalTempalates.display ? globalTempalates.display : "";
       if(!entity.templates.disable) entity.templates.disable = globalTempalates.disable ? globalTempalates.disable : "";
       if(!entity.templates.opacity) entity.templates.opacity = globalTempalates.opacity ? globalTempalates.opacity : "";
-      if(!entity.templates.grayscale) entity.templates.grayscale = globalTempalates.grayscale ? globalTempalates.grayscale : "";
 
       if(!entity.templates.title_color) entity.templates.title_color = globalTempalates.title_color ? globalTempalates.title_color : "";
       if(!entity.templates.input_color) entity.templates.input_color = globalTempalates.input_color ? globalTempalates.input_color : "";
@@ -485,7 +478,6 @@ class TilesCard extends HTMLElement {
     }
     if(entity.templates.disable) entity.disable = this._getValueFromTemplate(entity, "disable");
     if(entity.templates.opacity) paperComponent.style.setProperty("--tiles-opacity", this._getValueFromTemplate(entity, "opacity"));
-    if(entity.templates.grayscale) paperComponent.style.setProperty("--tiles-grayscale", this._getValueFromTemplate(entity, "grayscale"));
 
     if(entity.templates.style) paperComponent.style.cssText += this._getValueFromTemplate(entity, "style");
   }
@@ -664,8 +656,6 @@ class TilesCard extends HTMLElement {
           padding: var(--tiles-padding, var(--tiles-default-padding));
           color: var(--tiles-label-color, var(--tiles-default-contents-color));
           font-size: var(--tiles-label-size, var(--tiles-default-labels-size));
-          -webkit-filter: grayscale(var(--tiles-grayscale, var(--tiles-default-grayscale))); /* Google Chrome, Safari 6+ & Opera 15+ */
-          filter: grayscale(var(--tiles-grayscale, var(--tiles-default-grayscale))); /* Microsoft Edge and Firefox 35+ */
           text-align: var(--tiles-text-align, var(--tiles-default-text-align));
       
           --iron-icon-fill-color: var(--tiles-icon-color, var(--tiles-label-color, var(--tiles-default-contents-color)));
@@ -683,9 +673,7 @@ class TilesCard extends HTMLElement {
           border-color: var(--tiles-border-color-on, var(--tiles-border-color, var(--tiles-default-contents-color)));
           /* --iron-icon-stroke-color: 	Stroke color of the svg icon */
           --iron-icon-fill-color: var(--tiles-icon-color-on, var(--tiles-icon-color, var(--tiles-default-contents-color)));
-      
-          -webkit-filter: grayscale(var(--tiles-grayscale-on, var(--tiles-grayscale, var(--tiles-default-grayscale)))); /* Google Chrome, Safari 6+ & Opera 15+ */
-          filter: grayscale(var(--tiles-grayscale-on, var(--tiles-grayscale, var(--tiles-default-grayscale)))); /* Microsoft Edge and Firefox 35+ */
+    
       }
       
       paper-button.off {
@@ -698,10 +686,7 @@ class TilesCard extends HTMLElement {
           border-color: var(--tiles-border-color-off, var(--tiles-border-color, var(--tiles-default-contents-color)));
           /* --iron-icon-stroke-color: 	Stroke color of the svg icon */
           --iron-icon-fill-color: var(--tiles-icon-color-off, var(--tiles-icon-color, var(--tiles-default-contents-color)));
-      
-          -webkit-filter: grayscale(var(--tiles-grayscale-off, var(--tiles-grayscale, var(--tiles-default-grayscale)))); /* Google Chrome, Safari 6+ & Opera 15+ */
-          filter: grayscale(var(--tiles-grayscale-off, var(--tiles-grayscale, var(--tiles-default-grayscale)))); /* Microsoft Edge and Firefox 35+ */
-      
+    
       }
       
       paper-button.disabled {
@@ -715,8 +700,6 @@ class TilesCard extends HTMLElement {
           /* --iron-icon-stroke-color: 	Stroke color of the svg icon */
           --iron-icon-fill-color: var(--tiles-icon-color-disabled, var(--tiles-icon-color, var(--tiles-default-contents-color)));
       
-          -webkit-filter: grayscale(var(--tiles-grayscale-disabled, var(--tiles-grayscale, var(--tiles-default-grayscale-disabled)))); /* Google Chrome, Safari 6+ & Opera 15+ */
-          filter: grayscale(var(--tiles-grayscale-disabled, var(--tiles-grayscale, var(--tiles-default-grayscale-disabled)))); /* Microsoft Edge and Firefox 35+ */
       }
       
       paper-button .icon {
