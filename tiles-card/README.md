@@ -1,4 +1,6 @@
-# @andrewjfreyer's fork of Tiles Card for [Lovelace](https://www.home-assistant.io/lovelace/) forked from [rodrigofragadf](https://github.com/rodrigofragadf/lovelace-cards/raw/master/tiles-card/tiles-card.js) and updated. Huge thanks to @rodrigofragadf for all the work on this project. 
+Fork of Tiles Card for [Lovelace](https://www.home-assistant.io/lovelace/) forked from [rodrigofragadf](https://github.com/rodrigofragadf/lovelace-cards/raw/master/tiles-card/tiles-card.js) and updated. Huge thanks to @rodrigofragadf for all the work on this project. 
+
+_____
 
 ## Installation
 1. Download the [tiles-card.js](https://github.com/andrewjfreyer/lovelace-cards/raw/master/tiles-card/tiles-card.js).
