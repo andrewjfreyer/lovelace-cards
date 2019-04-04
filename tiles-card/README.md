@@ -1,6 +1,6 @@
 ## Description 
 
-Tiles Card for [Lovelace](https://www.home-assistant.io/lovelace/) forked from [rodrigofragadf](https://github.com/rodrigofragadf/lovelace-cards/raw/master/tiles-card/tiles-card.js) and updated. Huge thanks to @rodrigofragadf for all the work on this project. 
+Tiles Card for [Lovelace](https://www.home-assistant.io/lovelace/) forked from [Rodrigo Fraga](https://github.com/rodrigofragadf/lovelace-cards/). Huge thanks to Rodrigo for all the work on this project. 
 
 _____
 
